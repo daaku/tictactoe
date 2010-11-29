@@ -105,9 +105,9 @@ function makeGameManager() {
 function makeServer() {
   var server = http.createServer(function(req, res) {
     fs.readFile(__dirname + '/client.html', function(err, data) {
-      if (err) res.end('Error reading client.html');
       res.writeHead(200, {'Content-Type': 'text/html' });
-      res.end(data, 'utf8');
+      if (err) res.end('Error reading client.html');
+      else res.end(data, 'utf8');
     });
   });
 
