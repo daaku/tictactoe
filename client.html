@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Tic Tac Toe</title>
+    <meta name="viewport" content="width=device-width,user-scalable=no">
+  </head>
+  <body>
+    <table id="board">
+      <tr><td id="tile-00"></td><td id="tile-10"></td><td id="tile-20"></td></tr>
+      <tr><td id="tile-01"></td><td id="tile-11"></td><td id="tile-21"></td></tr>
+      <tr><td id="tile-02"></td><td id="tile-12"></td><td id="tile-22"></td></tr>
+    </table>
+    <form id="chatform">
+      <input id="chatmsg" type="text" autocomplete="off">
+      <input type="submit" value="Send">
+    </form>
+    <ol id="message"></ol>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+    <script src="http://d1eqzjbvoh1rux.cloudfront.net/json2.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = new io.Socket();
+      socket.connect();
+      socket.on('disconnect', function() {
+        messageHandler({
+          html:'Disconnected. <a onclick="location.reload()">Start over.</a>'});
+      });
+      socket.on('message', function(msg) {
+        var handler = window[msg.type + 'Handler'];
+        if (handler) handler(msg);
+        else console.error('Unhandled message', msg);
+      });
+
+      function messageHandler(msg) {
+        $('<li>' + msg.html + '</li>').prependTo('#message');
+      }
+
+      function placeMoveHandler(msg) {
+        $('#tile-' + msg.x + msg.y).html(msg.move);
+      }
+
+      $('#board td').click(function() {
+        socket.send(JSON.stringify({ type: 'move', tile: this.id }));
+      });
+
+      $('#chatform').submit(function(ev) {
+        socket.send(JSON.stringify({ type: 'chat', text: $('#chatmsg').val() }));
+        $('#chatmsg').val('');
+        ev.preventDefault();
+      });
+    </script>
+    <style>
+body {
+  font-family: sans-serif;
+}
+
+#board {
+  border-collapse: collapse;
+  margin-bottom: 0.25em;
+}
+#board td {
+  height: 1.5em;
+  width: 1.5em;
+  border: 0.1em #d72419 solid;
+  font-size: 3em;
+  text-align: center;
+}
+
+#message {
+  border: 0.1em solid #eee;
+  list-style-type: none;
+  padding: 0;
+}
+#message li {
+  padding: 0.5em;
+  margin: 0;
+}
+#message li:first-child {
+  font-weight: bold;
+  background: #b4e062 !important;
+}
+#message li:nth-child(odd) {
+  background: #F6F6F6;
+}
+#message li div.error {
+  color: #d72419;
+}
+
+#chatform {
+  background: #333;
+  padding: 0.25em 0.5em;
+}
+
+#chatmsg {
+  width: 16em;
+  padding: 0.5em;
+  background: #fff;
+}
+
+a, #chatform input[type=submit] {
+  cursor: pointer;
+  background: #999;
+  border: none;
+  padding: 0.7em 1em;
+  -moz-border-radius: 0.6em;
+  -webkit-border-radius: 0.6em;
+  margin-left: 0.25em;
+  text-shadow: 0 0.1em 0 #ccc;
+  font-weight: bold;
+}
+a {
+  padding: 0.45em 0.75em;
+}
+#chatform input[type=submit]:hover {
+  background: #A2A2A2;
+}
+#chatform input[type=submit]:active {
+  position: relative;
+  top: 0.2em;
+}
+    </style>
+  </body>
+</html>

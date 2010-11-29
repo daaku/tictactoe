@@ -1,0 +1,18 @@
+{
+  "name": "tictactoe",
+  "description": "A synchronous tic tac toe game.",
+  "homepage": "http://tictactoe.daaku.org/",
+  "keywords": ["website"],
+  "version": "0.0.1",
+  "author": "Naitik Shah <n@daaku.org>",
+  "dependencies": {
+    "socket.io": ">= 0.6.1",
+    "spark2": ">= 2.0.6"
+  },
+  "engines": { "node": ">= 0.2.5" },
+  "scripts": {
+    "start": "spark2",
+    "restart": "spark2 --respawn",
+    "stop": "spark2 --kill"
+  }
+}
